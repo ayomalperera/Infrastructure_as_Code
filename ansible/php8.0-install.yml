@@ -1,18 +1,22 @@
 - hosts: all
   become: yes
   tasks:
-    - name: Installation install software-properties-common
-      apt: name=software-properties-common
+    - name: Installation php8 dependencies
+      apt: 
+        pkg:
+          - lsb-release
+          - ca-certificates
+          - apt-transport-https
+          - software-properties-common  
 
-    - name: "Repo PHP 7.4"
+    - name: "Repo PHP 8.0"
       apt_repository:
         repo="ppa:ondrej/php"
+        
    
-    - name: "Updating the repo"
-      apt: update_cache=yes
 
-    - name: Installation PHP 7.4
-      apt: name=php7.4 state=present
+    - name: Installation PHP 8.0
+      apt: name=php8.0 state=present
 
     - name: install lamp stack
       apt:
