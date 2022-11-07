@@ -1,14 +1,30 @@
 ---
 - name: setup webserver vhost
   hosts: all
+  remote_user: ubuntu 
   become: true
   vars:
     app_user: "www-data"
     http_host: "{{ http_port }}example.com"
     http_conf: "{{ http_port }}example.com.conf"
-    http_port: "8186"
+    http_port: "80"
     disable_default: true
+
+
+
+
   tasks:
+    - name: apache installed
+      ansible.builtin.apt:
+        name: apache2
+        update_cache: true
+        state: latest
+    - name: apache installed
+      ansible.builtin.apt:
+        name: git
+        update_cache: true
+        state: latest
+
     - name: add port number to apache2
       lineinfile:
         path: /etc/apache2/ports.conf
@@ -22,11 +38,18 @@
         owner: "{{ app_user }}"
         mode: '0755'
 
-    - name: custom index.html
-      ansible.builtin.copy:
-        dest: "/var/www/{{ http_host }}/index.html"
-        content: |
-                    Custom Web Page
+
+    - name: Clone a repo with separate git directory
+      ansible.builtin.git:
+        repo: git@github.com:ayomalperera/html-codes.git
+        dest: /src/ansible-examples
+        separate_git_dir: "/var/www/{{ http_host }}/index.html"
+
+        # - name: custom index.html
+        #ansible.builtin.copy:
+        #dest: "/var/www/{{ http_host }}/index.html"
+        #content: |
+        #           Custom Web Page tttttttttttttt
 
     - name: set up Apache virtualhost
       ansible.builtin.template:

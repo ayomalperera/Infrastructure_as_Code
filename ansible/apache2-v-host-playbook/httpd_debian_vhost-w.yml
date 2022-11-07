@@ -1,22 +1,15 @@
 ---
 - name: setup webserver vhost
   hosts: all
+  remote_user: jude 
   become: true
-  gather_facts: no  
   vars:
     app_user: "www-data"
     http_host: "{{ http_port }}example.com"
     http_conf: "{{ http_port }}example.com.conf"
-    http_port: "80"
+    http_port: "8187"
     disable_default: true
   tasks:
-
-    - name: apache installed
-      ansible.builtin.apt:
-        name: apache2
-        update_cache: true
-        state: latest
-  
     - name: add port number to apache2
       lineinfile:
         path: /etc/apache2/ports.conf
@@ -34,7 +27,7 @@
       ansible.builtin.copy:
         dest: "/var/www/{{ http_host }}/index.html"
         content: |
-                    Custom Web Page
+                    Custom Web Page tttttttttttttt
 
     - name: set up Apache virtualhost
       ansible.builtin.template:
@@ -45,10 +38,6 @@
       ansible.builtin.command: "/usr/sbin/a2ensite {{ http_conf }}"
       notify: reload Apache
 
-    - name: disable default Apache site
-      ansible.builtin.command: "/usr/sbin/a2dissite 000-default.conf"
-      when: disable_default
-      notify: reload Apache
 
     - name: open firewall
       community.general.ufw:
