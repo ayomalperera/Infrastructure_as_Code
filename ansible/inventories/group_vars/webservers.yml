@@ -1,0 +1,8 @@
+apache_vhosts:
+  - server_name: skmcmsuat2.kindness.sg
+    server_alias: skmcmsuat2.kindness.sg
+    document_root: /var/www/skmcmsuat2.kindness.sg/cms
+    cors_origin: https://skmwebuat2.kindness.sg
+
+    git_repo: git@github.com:your-org/skmcmsuat2.git
+    git_branch: main

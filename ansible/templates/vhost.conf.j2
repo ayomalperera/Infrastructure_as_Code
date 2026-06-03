@@ -1,0 +1,64 @@
+<VirtualHost *:80>
+    ServerName {{ item.server_name }}
+    ServerAlias {{ item.server_alias }}
+    ServerAdmin webmaster@localhost
+    DocumentRoot {{ item.document_root }}
+
+    Protocols h2 http/1.1
+
+    <Directory />
+        Options -Indexes +FollowSymLinks +MultiViews
+        AllowOverride None
+        Require all denied
+    </Directory>
+
+    <Directory {{ item.document_root }}/>
+        Options -Indexes +FollowSymLinks +MultiViews
+        AllowOverride All
+        Require all granted
+
+        <FilesMatch "^(readme\.html|license\.txt|wp-config\.php|\.git|config|debug\.log)$">
+            <IfModule mod_authz_core.c>
+                Require all denied
+            </IfModule>
+            <IfModule !mod_authz_core.c>
+                Order allow,deny
+                Deny from all
+            </IfModule>
+        </FilesMatch>
+
+        <LimitExcept GET POST>
+            Require all denied
+        </LimitExcept>
+    </Directory>
+
+    <Directory "{{ item.document_root }}/wp-content/uploads">
+        <Files "*.php">
+            Order Deny,Allow
+            Deny from all
+        </Files>
+    </Directory>
+
+    <FilesMatch "\.(exe|sh|cgi|pl|py)$">
+        Require all denied
+    </FilesMatch>
+
+    <Files .htaccess>
+        Order Allow,Deny
+        Deny from all
+    </Files>
+
+    TraceEnable Off
+
+    <IfModule mod_headers.c>
+        <LocationMatch "^/wp-json/">
+            Header always set Access-Control-Allow-Origin "{{ item.cors_origin }}"
+            Header always set Access-Control-Allow-Methods "GET, OPTIONS"
+            Header always set Access-Control-Allow-Headers "Content-Type"
+        </LocationMatch>
+    </IfModule>
+
+    ErrorLog ${APACHE_LOG_DIR}/{{ item.server_name }}_error.log
+    CustomLog ${APACHE_LOG_DIR}/{{ item.server_name }}_access.log combined
+
+</VirtualHost>
